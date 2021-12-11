@@ -1,7 +1,7 @@
 package it.giacomobergami.CSC8016.coursework.operations;
 
 public class AccountOperation extends Operation {
-    private String username;
+    private final String username;
 
     public AccountOperation(String operationType, String username) {
         super(operationType);

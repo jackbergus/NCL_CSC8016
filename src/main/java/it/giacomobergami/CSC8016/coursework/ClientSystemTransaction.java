@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * This is a simple transaction related to one single account, associated to a given username
  */
-public interface SystemTransaction extends AutoCloseable {
+public interface ClientSystemTransaction extends AutoCloseable {
 
     /**
      * Deposits some positive money to the account
