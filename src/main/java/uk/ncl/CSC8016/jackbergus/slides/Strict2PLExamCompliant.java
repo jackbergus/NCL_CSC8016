@@ -13,11 +13,11 @@ public class Strict2PLExamCompliant {
            rwlA.writeLock().lock();
            var localA = A;
            A = op ? (localA + i): (localA * i);
-           rwlA.readLock().lock();
+           rwlB.readLock().lock();
            var localB = B;
            // commit!
            rwlB.readLock().unlock();
-           rwlB.writeLock().unlock();
+           rwlA.writeLock().unlock();
         });
     }
 
