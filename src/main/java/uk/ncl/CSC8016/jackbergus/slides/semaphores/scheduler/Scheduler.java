@@ -22,30 +22,43 @@ public class Scheduler<T> {
     public Scheduler(int tick_time_milliseconds, Pair<T, List<Function<T, T>>>... n) {
         assert (n != null);
         this.tick_time = tick_time_milliseconds;
+        
+        // New Java style: create an array of n.length BinarySemaphores, initialized to zero (events)
         start = IntStream.range(0, n.length)
                          .mapToObj(i -> new BinarySemaphore(0))
                          .toArray(BinarySemaphore[]:: new);
+        // Liveliness
         this.doStop = false;
+        
+        // For each task in the array of tasks n, generate a new thread and start it: this will wait for the scheduler to make them run!
         tasks = IntStream.range(0, n.length)
                 .mapToObj(i -> {
                     var t =  new Thread(new Task(i, n[i].key, n[i].value));
                     t.start();
                     return t;
                 }).collect(Collectors.toList());
+        
+        // Creating, but not starting, the clock thread.
         clockThread = new Thread(new Clock());
     }
 
     public void start(int[] interval) {
         if (!(interval.length == tasks.size()))
             throw new RuntimeException("ERROR: the time intervals associated to each thread should be the same number as the threads!");
+        
+        // Ticks to be waited before scheduling the next task
         int[] next = new int[interval.length];
+        // Initializing the ticks to be waited with the provided interval array
         for (int i = 0; i<interval.length; i++) next[i] = interval[i];
+        // Definition of the scheduler, as in the slides
         actualScheduler = new Thread(() -> {
             while (!doStop) {
                 try {
                     tick.acquire();
                     System.out.println("Got a tick!");
                     for (int i = 0; i<tasks.size(); i++) {
+                        // I will need to schedule this activity only if the thread has not been stopped yet!
+                        // Exercise: what does it happen if I remove this condition?
                         if (tasks.get(i).isAlive()) {
                             next[i]--;
                             if (next[i] == 0) {
@@ -59,18 +72,21 @@ public class Scheduler<T> {
                 }
             }
         });
-        actualScheduler.start();
+        actualScheduler.start(); // Starting both the scheduler and the ticker.
         clockThread.start();
     }
 
     public synchronized void join() {
         if (!doStop) {
             try {
+                // Waiting for all of the activities to finish
                 for (var x : tasks) {
                     x.join();
                 }
+                // After they stop, I can stop the whole computation
                 stop();
                 System.out.println("Should stop now!");
+                // Joining the two orchestrators!
                 actualScheduler.join();
                 clockThread.join();
             } catch (InterruptedException e) {
@@ -90,7 +106,7 @@ public class Scheduler<T> {
                 try {
                     Thread.sleep(tick_time);
                     System.out.println("tick!");
-                    tick.release();
+                    tick.release(); // A new tick event is available
                 } catch (InterruptedException e) {
                     doStop = true;
                     e.printStackTrace();
@@ -119,8 +135,8 @@ public class Scheduler<T> {
         public void run() {
             while ((!doStop) && (!doLocalStop) && (toRun.hasNext())) {
                 try {
-                    start[taskId].acquire();
-                    toRun.next();
+                    start[taskId].acquire(); // Waiting to be orchestrated by the scheduler
+                    toRun.next();            // Performing the computation associated to the current step
                 } catch (InterruptedException e) {
                     doLocalStop = true;
                     e.printStackTrace();
