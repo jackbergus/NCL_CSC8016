@@ -1,0 +1,5 @@
+target/
+target/*
+.idea/
+.idea/*
+/home/giacomo/Scaricati/csc8016_solution/csc8016/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/ok_implementation/*
