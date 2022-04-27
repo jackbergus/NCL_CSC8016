@@ -1,7 +1,1 @@
-target/
-target/*
-.idea/
-.idea/*
-src/main/java/uk/ncl/CSC8016/jackbergus/coursework/ok_implementation
-target/
-target/*
+/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/ok_implementation
