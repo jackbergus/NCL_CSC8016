@@ -17,9 +17,11 @@ public class Scheduler<T> {
     List<Thread> tasks;
     Thread actualScheduler;
     Thread clockThread;
+    int tick_time;
 
-    public Scheduler(Pair<T, List<Function<T, T>>>... n) {
+    public Scheduler(int tick_time_milliseconds, Pair<T, List<Function<T, T>>>... n) {
         assert (n != null);
+        this.tick_time = tick_time_milliseconds;
         start = IntStream.range(0, n.length)
                          .mapToObj(i -> new BinarySemaphore(0))
                          .toArray(BinarySemaphore[]:: new);
@@ -86,7 +88,7 @@ public class Scheduler<T> {
         public void run() {
             while (!doStop) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(tick_time);
                     System.out.println("tick!");
                     tick.release();
                 } catch (InterruptedException e) {
@@ -117,7 +119,6 @@ public class Scheduler<T> {
         public void run() {
             while ((!doStop) && (!doLocalStop) && (toRun.hasNext())) {
                 try {
-//                    System.out.println(this.taskId);
                     start[taskId].acquire();
                     toRun.next();
                 } catch (InterruptedException e) {

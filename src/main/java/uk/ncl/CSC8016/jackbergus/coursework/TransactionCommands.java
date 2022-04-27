@@ -1,7 +1,6 @@
 package uk.ncl.CSC8016.jackbergus.coursework;
 
 import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
 
 public interface TransactionCommands extends AutoCloseable {
 

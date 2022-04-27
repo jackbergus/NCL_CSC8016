@@ -22,7 +22,7 @@ public class SchedulerExample {
                 })
                 .collect(Collectors.<Function<Integer,Integer>>toList());
 
-        var scheduler = new Scheduler<>(new Pair<>(0, adder), new Pair<>(1, multiplier));
+        var scheduler = new Scheduler<>(1000, new Pair<>(0, adder), new Pair<>(1, multiplier));
         scheduler.start(new int[]{1,3});
         scheduler.join();
 
