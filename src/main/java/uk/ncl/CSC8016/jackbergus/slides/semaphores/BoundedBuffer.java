@@ -47,7 +47,7 @@ public class BoundedBuffer<T> {
     }
 
     public static void main(String args[]) {
-        var buffer = new BoundedBuffer<Integer>(10);
+        var buffer = new BoundedBuffer<Integer>(1000);
         var producer = new Thread(() -> {
             while (true) {
                 var val = produce(100, 0);

@@ -9,9 +9,9 @@ public class SchedulerExample {
     public static void main(String args[]) throws InterruptedException {
         var adder = IntStream
                 .range(0, 5)
-                .mapToObj((x) -> (Function<Integer, Integer>) integer -> {
-                    System.out.println(integer+" -> "+x+"+"+integer+" = "+(x+integer));
-                    return x + integer;
+                .mapToObj((x) -> (Function<Integer, Integer>) previous_value -> {
+                    System.out.println(previous_value+" -> "+x+"+"+previous_value+" = "+(x+previous_value));
+                    return x + previous_value;
                 })
                 .collect(Collectors.<Function<Integer,Integer>>toList());
         var multiplier = IntStream

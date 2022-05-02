@@ -25,6 +25,7 @@ public class Buffer<T> {
     public static void main(String args[]) {
         var buffer = new Buffer<Integer>();
         var producer = new Thread(() -> {
+            int i = 0;
             while (true) {
                 var val = produce(100, 0);
                 System.out.println("Putting: "+val);
