@@ -74,7 +74,7 @@ public class ReadWriteMonitor_First<T> {
 
     private void exclusiveLock() {
         monitor.lock();
-        while ((nw > 0) && (nr > 0)) try {
+        while ((nw > 0) || (nr > 0)) try {//changed
             okToWrite.await();
         } catch (Exception e) {
         }

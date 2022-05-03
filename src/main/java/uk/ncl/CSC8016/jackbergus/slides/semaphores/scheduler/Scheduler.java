@@ -2,9 +2,7 @@ package uk.ncl.CSC8016.jackbergus.slides.semaphores.scheduler;
 
 import uk.ncl.CSC8016.jackbergus.slides.semaphores.BinarySemaphore;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -119,7 +117,6 @@ public class Scheduler<T> {
     }
 
     public class Task implements Runnable {
-
         private boolean doLocalStop = false;
         int taskId;
         TaskList<T> toRun;

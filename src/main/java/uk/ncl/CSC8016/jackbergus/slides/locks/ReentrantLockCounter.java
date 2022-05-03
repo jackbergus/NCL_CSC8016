@@ -19,7 +19,7 @@ public class ReentrantLockCounter {
             lock.unlock();
         }
     }
-    public synchronized void decrement() {
+    public  void decrement() {
         lock.lock();
         try {
             c--;
@@ -27,7 +27,7 @@ public class ReentrantLockCounter {
             lock.unlock();
         }
     }
-    public synchronized int value() {
+    public  int value() {
         int copy;
         lock.lock();
         try {
@@ -37,7 +37,7 @@ public class ReentrantLockCounter {
         }
         return copy;
     }
-    public synchronized void increment(int n) {
+    public  void increment(int n) {
         lock.lock();
         try {
             if (n>0) {
@@ -58,7 +58,7 @@ public class ReentrantLockCounter {
         var t2 = new Thread(() -> {
             System.out.println("I got "+rlc.value());
         });
-        t2.start(); t1.start();
+        t1.start(); t2.start();
         t1.join(); t2.join();
     }
 }
