@@ -3,3 +3,7 @@ target/
 target/*
 .idea/
 .idea/*
+/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/marking_scheme2122.aux
+/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/marking_scheme2122.out
+/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/marking_scheme2122.log
+/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/marking_scheme2122.synctex.gz
