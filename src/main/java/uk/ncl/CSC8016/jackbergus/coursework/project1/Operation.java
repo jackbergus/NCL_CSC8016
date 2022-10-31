@@ -1,9 +1,8 @@
-package uk.ncl.CSC8016.jackbergus.coursework;
+package uk.ncl.CSC8016.jackbergus.coursework.project1;
 
-import java.sql.Time;
 import java.util.*;
 
-import static uk.ncl.CSC8016.jackbergus.coursework.OperationType.*;
+import static uk.ncl.CSC8016.jackbergus.coursework.project1.OperationType.*;
 
 public class Operation implements Comparable<Operation> {
 

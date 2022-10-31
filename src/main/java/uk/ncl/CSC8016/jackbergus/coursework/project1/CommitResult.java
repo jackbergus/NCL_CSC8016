@@ -1,4 +1,4 @@
-package uk.ncl.CSC8016.jackbergus.coursework;
+package uk.ncl.CSC8016.jackbergus.coursework.project1;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package uk.ncl.CSC8016.jackbergus.coursework.utils;
+package uk.ncl.CSC8016.jackbergus.coursework.project1.utils;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicReference;
