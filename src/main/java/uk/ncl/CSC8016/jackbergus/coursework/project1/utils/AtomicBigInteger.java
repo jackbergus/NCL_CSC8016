@@ -11,6 +11,10 @@ public final class AtomicBigInteger {
         valueHolder.set(bigInteger);
     }
 
+    public void reset(BigInteger val) {
+        valueHolder.set(val);
+    }
+
     public BigInteger incrementAndGet() {
         for (; ; ) {
             BigInteger current = valueHolder.get();

@@ -1,0 +1,172 @@
+\documentclass{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,hyperref}
+\usepackage{parskip}
+\usepackage{graphicx}
+
+\usepackage[tagged, highstructure]{accessibility}
+% Margins
+\usepackage[top=2.5cm, left=3cm, right=3cm, bottom=4.0cm]{geometry}
+% Colour table cells
+\usepackage[table]{xcolor}
+
+% Get larger line spacing in table
+\newcommand{\tablespace}{\\[1.25mm]}
+\newcommand\Tstrut{\rule{0pt}{2.6ex}}         % = `top' strut
+\newcommand\tstrut{\rule{0pt}{2.0ex}}         % = `top' strut
+\newcommand\Bstrut{\rule[-0.9ex]{0pt}{0pt}}   % = `bottom' strut
+
+%%%%%%%%%%%%%%%%%
+%     Title     %
+%%%%%%%%%%%%%%%%%
+\title{Coursework CSC8016}
+\author{Giacomo Bergami}
+\date{26\textsuperscript{th} of April, 2022}
+
+\begin{document}
+	\maketitle
+	
+	\section*{Use Case Scenario}
+We want to implement a bank system, whether the threads are
+either clients logging to the servers, or the bank server containing
+the information for each account. Each client interacts with the server through the \texttt{BankFacade} by accessing an \texttt{openTransaction} method, through which the each client can create multiple accesses to its bank account. This mimicks the possibility of multitasking operations via mobile phone, ATM, web banking. Each client can only \textsf{pay} or \textsf{withdraw} money, and gets the list of the total movements after \textsf{commit}-ting the operation. In a realistic scenarios, transactions might also \textsf{abort}; e.g.:
+\begin{itemize}
+\item The ATM receives the request of money, but the server fails and does
+not deduct the money from the on-line account.
+\item The server fails after deducting the from the on-line account, but no
+money is given at the ATM
+\end{itemize}
+Still, all of the operations done by the thread over the specific bank account will be confirmed and will become effective only when the transaction is going to be \textbf{commit}ted. After a commit or an abort, no further operation through that transaction is allowed, thus requiring the user to open another transaction within the same thread. More details on the operations' requirements are given in the final marking scheme.
+
+
+As in any industrial setting where teams split up the duties,
+you are assigned an API that you need to implement. Such an API is provided both on Canvas and at \url{https://github.com/jackbergus/NCL_CSC8016}. This will then require to extend the \texttt{BankFacade} for implementing the definition of novel transactions, and the implementation of \texttt{TransactionCommands} for performing the client-server communication. The student is free to choose whichever is the best way to make these two entities communicate. E.g., the bank could be either modelled as a finer-grained monitor, but inside this monitor at least one thread per logged user should be running; also, such a bank could be also implemented as a consumer threads handling all of the clients' messages. 
+	
+	
+	\section*{Assumptions}
+	\begin{itemize}
+		\item In a realistic example, communications happen between processes via UDP messages. In this module, we don't require that. We can freely assume that each client (ATM, OnLine Banking) is mimicked by one single
+		thread. We assume they directly exploit such an interface (no
+		FrontEnd is required!)
+		\item  If the bank is implemented as a server, such a thread might receive the ``client messages'' through shared
+		variables. 
+		\item The server should also keep track of the transactions
+		that are performed for handling commit/abort correctly. You are not required to tolerate the server crash (this is more of
+		a back-up task rather than a concurrent programming one), but
+		you must tolerate the client ones (that is more related to
+		concurrent programs’ management)!
+		\item We assume that the \texttt{BankFacade} class is initialized with the users having an account in their bank as well as the balance associated to that (constructor with \texttt{HashMap<String, Double>}). The system should not allow to open/close new bank accounts.
+		\item The server should allow multiple users logging in running contemporarily on distinct bank account. In order to maximise seriality and concurrency requirements, the students might investigate \textit{optimistic protocols} for transactions, but this is not strictly required.
+		\item The actual implementation provided both in Canvas and on GitHub provides incorrect solutions for the following reasons:
+		\begin{enumerate}
+		\item The execution of the process is \textbf{wrongly} \underline{always} sequential, as
+		one client always blocks the other clients from
+		accessing the bank!
+		\item Client's crashes are \textbf{wrongly} \underline{not} tolerated, as those are always committing the operations to then
+		main log without checking whether the action was
+		effectively performed or not!
+		\item Somehow, the computations are ``logically'' correct, that is \textsf{pay}, \textsf{withdraw}, \textsf{commit}, and \textsf{abort} implement the expected semantics. Still, this is not sufficient for passing the coursework with full marks. 
+		\end{enumerate}
+	\end{itemize}
+	
+	\section*{Submission Requirements}
+	\begin{enumerate}
+		\item \texttt{BankFacade} and \texttt{TransactionCommands} should be extended.
+		\item Submit the code as a zipped \textit{Maven} project. with \textbf{no} \textit{jar} and \textit{classes}. The source code will be recompiled from scratch, and no jar/class is going to be run.
+		 
+		\item If you want to use an external Java library, please consider the following:
+		\begin{itemize}
+			\item The Java library should be explicitly described as a \texttt{<dependency>} in the \texttt{pom.xml} file, and should only access the libraries from the default \textit{Maven Central Repository}.
+			\item A library might provide single concurrency mechanisms primitives, but not ready-made solutions already composing those: semaphores, monitors, locks, just logs, thread barriers, thread pools, passing le baton mechanisms are allowed. Code reuse from the exercises and examples seen in class is permitted.
+			
+			\item Systems completely solving the coursework for you are \textbf{strictly prohibited}: e.g., any kind of (data) management system having concurrency control (ensuring safe concurrent thread access to any data representation) and supporting concurrent transactions (implementing any kind of transaction protocol, either pessimistic or optimistic) \textbf{must be avoided}, as they both implement commit/aborts and thread-safe operations on data. 
+			\item None of the (direct or indirect) dependencies of the coursework should rely on external servers or processes to run or to be installed.
+			\item The solution should \textbf{not} include external jar files.
+			\item If unsure whether the solution might be exploited, please ask before submitting.
+		\end{itemize}
+		 
+		\item Attached to the source code, please provide a short report motivating the compliance of the source code to each point and sub-point of the marking scheme. The report should also state what is the name of the class of the class extending \texttt{BankFacade} and its package.
+		
+		\item At the zip's root, please write a \textit{classinfo.txt} file containing the package and class information to the class extending \texttt{BankFacade}. E.g., \\
+		
+		uk.ncl.CSC8016.jackbergus.coursework.wrongimplementation.WrongBankWithLocks
+
+	\end{enumerate}
+
+
+	\section*{Marking Scheme}
+	The marking scheme is capped at  \textbf{100\%}.
+	\begin{itemize}
+		\item Single-Thread Correctness \textbf{[+50\%]}
+			\begin{description}
+			\item [+10\%:] I cannot open a transaction if the user does not appear in the initialization map.
+			\item [+10\%:] I can always open a transaction if the user, on the other hand, appears on the initialization map.
+			\begin{itemize}
+				\item The returned \texttt{totalAmount} reflect the amount that was committed.
+			\end{itemize}
+			\item [+15\%:] After committing a transaction, the results provides the total changes into the account.
+			\begin{itemize}
+				\item The returned commit information should contain at least one \textit{Operation} of \textit{OperationType}.
+				\item After paying money into the account, the final total amount is the sum of the previous amount of money and the amount being paid.
+				\item I cannot re-commit or abort a closed transaction.
+				\item The successful operations should contain all of the operations before the commit, as well as the commit.
+			\end{itemize}
+			\item [+15\%: ] No overdraft is allowed.
+			\begin{itemize}
+				\item I can always withdraw $0.0$ money from my account.
+				\item I can never withdraw an amount of money which is greater than the amount at my disposal.
+				\item The commit should list all of the operations, thus including the attempt to overdraft.
+				\item The operation causing the overdraft shall not consider as an unsuccessful operation, rather than an \textit{ignored} one.
+			\end{itemize}
+	
+		\end{description}
+
+
+	\item  Multi-Threaded Correctness \textbf{[+40\%]}
+\begin{description}
+	\item [+10\%:] A single user can open concurrent transactions.
+	\begin{itemize}
+		\item As other concurrent transactions are not committed yet, each thread can only see the committed statues from their account.
+		\item Any user should be allowed to concurrently log in in its account (e.g., through different possible devices).
+		\item Absence of \textbf{write-write} conflicts.
+		\item Under the assumption that user's threads never abort, the final amount of the money in the bank account correspond to the overall total of pays and withdraws.
+	\end{itemize}
+	\item [+10\%:] Multiple users can open concurrent transactions. \textit{[Same requirements as above, plus the following:]}
+\begin{itemize}
+	\item Different users should never run serially, as they operate on different accounts (The code unrealistically assumes that neither  pay other accounts nor receive money from them).
+\end{itemize}
+\item [+10\%:] No dirty reads allowed.
+\begin{itemize}
+	\item A thread shall never see in the total account balance after the commit the amount of money being paid/withdrawn before other threads' commits.
+	\item A thread shall never be able to withdraw money paid by other non-committing threads. 
+	\item Ignored operations should consider the unsuccessful withdraws from the account.
+\end{itemize} 
+\item [+10\%:] Handing aborted transactions:
+\begin{itemize}
+	\item Operations from aborted transactions should be completely ignored/reversed.
+	\item In particular, aborted threads should leave the bank in a consistent state, so further transactions run as expected.
+\end{itemize}
+\end{description}
+
+
+\item Advanced Features
+\begin{itemize}
+	\item  \textbf{[+1\%]} The bank is emulated realistically as a separated thread.
+	\item  \textbf{[+1\%]} The code exploits Java's concurrent collections.
+	\item \textbf{[+1\%]} The program allows to visually determine the correctness of the operations performed by the threads (e.g., terminal prints or graphical user interfaces).
+	\item \textbf{[+1\%]} The student correctly exploits semaphores.
+	\item  \textbf{[+2\%]} A thread perceives the updated account balance as soon as any of the remaining concurrent thread is committed.
+	\item \textbf{[+2\%]} The student exploited the optimistic transaction principle, and the operations were logged in a journal (either in primary memory or in secondary memory).
+	\item \textbf{[+2\%]} Usage of monitors or multithreaded producers and consumers (semaphores might be also exploited).
+	\item \textbf{[+3\%]} Thread pools are used to handle multiple requests from multiple users.
+	\item \textbf{[+3\%]} Any Java library imported via \texttt{pom.xml} `not violating the 3\textsuperscript{rd} Submission Requirement.
+	\item  \textbf{[+4\%]} In addition to the previous point, bank thread crashes are also tolerated, e.g., all of the transactions are assumed to be aborted, and the bank journal is stored on disk. 
+\end{itemize}
+	\end{itemize}
+
+
+	
+\end{document}
+

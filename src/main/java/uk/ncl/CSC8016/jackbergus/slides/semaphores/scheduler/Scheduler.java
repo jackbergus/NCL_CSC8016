@@ -2,6 +2,7 @@ package uk.ncl.CSC8016.jackbergus.slides.semaphores.scheduler;
 
 import uk.ncl.CSC8016.jackbergus.slides.semaphores.BinarySemaphore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,6 +26,19 @@ public class Scheduler<T> {
         start = IntStream.range(0, n.length)
                          .mapToObj(i -> new BinarySemaphore(0))
                          .toArray(BinarySemaphore[]:: new);
+        /*
+
+        The previous single-statement code is equivalent to this block of code:
+
+        List<BinarySemaphore> list = new ArrayList<>();
+        for (int i1 = 0; i1 < n.length; i1++) {
+            BinarySemaphore binarySemaphore = new BinarySemaphore(0);
+            list.add(binarySemaphore);
+        }
+        start = list.toArray(new BinarySemaphore[0]);
+
+        */
+
         // Liveliness
         this.doStop = false;
         
@@ -35,6 +49,16 @@ public class Scheduler<T> {
                     t.start();
                     return t;
                 }).collect(Collectors.toList());
+        /*
+        The previous single-statement code is equivalent to this block of code:
+
+        tasks = new ArrayList<>();
+        for (int i = 0; i<n.length; i++) {
+            var t =  new Thread(new Task(i, n[i].key, n[i].value));
+            t.start();
+            tasks.add(t);
+        }
+         */
         
         // Creating, but not starting, the clock thread.
         clockThread = new Thread(new Clock());
@@ -125,7 +149,7 @@ public class Scheduler<T> {
             assert start.length < taskId;
             assert tasks != null;
             this.taskId = taskId;
-            toRun = new TaskList<T>(task, tasks);
+            toRun = new TaskList<>(task, tasks);
         }
 
         @Override
