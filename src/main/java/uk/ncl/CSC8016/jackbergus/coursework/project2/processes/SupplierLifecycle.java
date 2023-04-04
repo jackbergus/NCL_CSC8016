@@ -5,13 +5,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SupplierLifecycle implements Runnable {
 
-    private final SolutionServer s;
+    private final RainforestShop s;
 
     private volatile boolean hasRetrievedOneProduct;
     private AtomicBoolean stopped;
     private final Random rng;
 
-    public SupplierLifecycle(SolutionServer s) {
+    public SupplierLifecycle(RainforestShop s) {
         this.s = s;
         this.rng = new Random(0);
         hasRetrievedOneProduct = false;

@@ -8,7 +8,7 @@ import java.util.Random;
 public class ClientLifecycle implements Runnable {
 
     private final String username;
-    private final SolutionServer s;
+    private final RainforestShop s;
     private final int items_to_pick_up;
     private final double total_available_money, shelfing_prob;
 
@@ -19,7 +19,7 @@ public class ClientLifecycle implements Runnable {
     BasketResult l;
 
     public ClientLifecycle(String username,
-                           SolutionServer s,
+                           RainforestShop s,
                            int items_to_pick_up,
                            double shelfing_prob,
                            double total_available_money,

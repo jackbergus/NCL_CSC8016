@@ -1,7 +1,7 @@
 package uk.ncl.CSC8016.jackbergus.coursework.project2.testing;
 
 import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.ClientLifecycle;
-import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.SolutionServer;
+import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.RainforestShop;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.SupplierLifecycle;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.Transaction;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.utils.Item;
@@ -20,34 +20,7 @@ public class Testing {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
 
-    public static Function<Boolean,List<Message>> test_12 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("user1");
-        ofUserNames.add("user2");
-        Map<String, Pair<Double, Integer>> m = new HashMap<>();
-        m.put("product", new Pair<>(1.0, 3));
-
-        /// TEST 1) A supplier can be correctly stopped
-        {
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-            SupplierLifecycle sup = new SupplierLifecycle(s);
-            var t = sup.startThread();
-            s.stopSupplier();
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if (sup.isStopped()) {
-                first_test.add(new Message(true, "GOOD (1): the supplier stopped correctly!"));
-            } else {
-                first_test.add(new Message(false, "ERROR (1): the supplier did not stop!"));
-            }
-        }
-
-        return first_test;
-    };
+    public static Function<Boolean,List<Message>> test_12 = (Boolean isGlobalLock) -> null;
 
     public static Function<Boolean,List<Message>> test_11 = (Boolean isGlobalLock) -> {
         List<Message> first_test = new ArrayList<>();
@@ -59,7 +32,7 @@ public class Testing {
 
         /// TEST 1) A user cannot shelf a product if nothing was basketed
         {
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             Optional<Transaction> l = s.login("user2");
             if (l.isPresent()) {
                 var transaction = l.get();
@@ -101,7 +74,7 @@ public class Testing {
 
         /// TEST 1) server with no users
         {
-            SolutionServer s = new SolutionServer(Collections.emptyList(), Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(Collections.emptyList(), Collections.emptyMap(), isGlobalLock);
             try {
                 var result = s.login("bogus");
                 if (result.isPresent()) {
@@ -119,7 +92,7 @@ public class Testing {
 
         /// TEST 3) server with one user, wrong log-in
         {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, Collections.emptyMap(), isGlobalLock);
             try {
                 var result = s.login("boguso");
                 if (result.isPresent()) {
@@ -144,7 +117,7 @@ public class Testing {
         ofUserNames.add("bogus");
         /// TEST 2) server with one user
         {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, Collections.emptyMap(), isGlobalLock);
             try {
                 var result = s.login("bogus");
                 if (!result.isPresent()) {
@@ -167,7 +140,7 @@ public class Testing {
         ofUserNames.add("bogus");
         /// TEST 2) server with one user
         {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, Collections.emptyMap(), isGlobalLock);
             try {
                 var result = s.login("bogus");
                 if (!result.isPresent()) {
@@ -196,7 +169,7 @@ public class Testing {
         }
 
         {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, Collections.emptyMap(), isGlobalLock);
             try {
                 var result = s.login("bogus");
                 if (!result.isPresent()) {
@@ -231,28 +204,7 @@ public class Testing {
     };
 
     public static Function<Boolean,List<Message>> test_03 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("bogus");
-        /// Cannot log-in multiple times for optimistic transactions, too!
-        {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
-            try {
-                var result1 = s.login("bogus");
-                var result2 = s.login("bogus");
-                if (!result2.isPresent()) {
-                    first_test.add(new Message(true, "ERROR: you should log-in multiple times!"));
-                    result1.get().logout();
-                } else if (result1.isPresent() && result2.isPresent()) {
-                    first_test.add(new Message(true, "GOOD: the same user can log in more than once!"));
-                } else {
-                    first_test.add(new Message(false, "ERROR: general logging error"));
-                }
-            } catch (Exception e) {
-                first_test.add(new Message(false, e.getMessage()+(Thread.currentThread().getStackTrace())));
-            }
-        }
-        return first_test;
+        return null;
     };
 
 
@@ -262,7 +214,7 @@ public class Testing {
         ofUserNames.add("bogus");
         /// TEST 1) Cannot basket unavailable product
         {
-            SolutionServer s = new SolutionServer(ofUserNames, Collections.emptyMap(), isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, Collections.emptyMap(), isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -282,7 +234,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -307,7 +259,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -348,7 +300,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -377,7 +329,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -419,7 +371,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -466,7 +418,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 1));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -514,7 +466,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 2));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -563,7 +515,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 2));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -613,7 +565,7 @@ public class Testing {
         {
             Map<String, Pair<Double, Integer>> m = new HashMap<>();
             m.put("product", new Pair<>(1.0, 3));
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
+            RainforestShop s = new RainforestShop(ofUserNames, m, isGlobalLock);
             try {
                 var result1 = s.login("bogus");
                 result1.ifPresent(transaction -> {
@@ -661,216 +613,14 @@ public class Testing {
         return first_test;
     };
 
-    public static Function<Boolean,List<Message>> test_07 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("user1");
-        ofUserNames.add("user2");
-        Map<String, Pair<Double, Integer>> m = new HashMap<>();
-        m.put("product", new Pair<>(1.0, 3));
+    public static Function<Boolean,List<Message>> test_07 = (Boolean isGlobalLock) -> null;
 
-        // It shall be never possible that two threads can withdraw the same object simultaneously
-        boolean error = false;
-        for (int i = 0; i<10000; i++) {
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-            AtomicReference<Item> val1 = new AtomicReference<>(null),
-                                    val2 = new AtomicReference<>(null);
-            Thread t1 = new Thread(() -> {
-                var result1 = s.login("user1");
-                result1.ifPresent(transaction ->  {
-                    transaction.basketProduct("product");
-                    val1.set(transaction.getUnmutableBasket().get(0));
-                });
-            });
-            Thread t2 = new Thread(() -> {
-                var result2 = s.login("user2");
-                result2.ifPresent(transaction ->  {
-                    transaction.basketProduct("product");
-                    val2.set(transaction.getUnmutableBasket().get(0));
-                });
-            });
-            t1.start(); t2.start();
-            try {
-                t1.join();
-                t2.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if (Objects.equals(val1.get(), val2.get())) {
-                error = true;
-            }
-        }
-        if (!error) {
-            first_test.add(new Message(true, "GOOD: after some tests, the two threads were never able to access to the same object!"));
-        } else {
-            first_test.add(new Message(false, "ERROR: after some tests, the two threads were able to access to the same object!"));
-        }
+    public static Function<Boolean,List<Message>> test_08 = (Boolean isGlobalLock) -> null;
 
-        return first_test;
-    };
+    public static Function<Boolean,List<Message>> test_09 = (Boolean isGlobalLock) -> null;
 
+    public static Function<Boolean,List<Message>> test_10 = (Boolean isGlobalLock) -> null;
 
-
-
-    public static Function<Boolean,List<Message>> test_08 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("user1");
-        ofUserNames.add("user2");
-        Map<String, Pair<Double, Integer>> m = new HashMap<>();
-        m.put("product", new Pair<>(1.0, 3));
-        // A ClientLifecycle (picking only the available items) shall not pick more than the number of available ones
-        SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-        ClientLifecycle client = new ClientLifecycle("user1", s, 4, 0.0, 100.0, 0);
-        try {
-            var result = client.startJoinAndGetResult(true);
-            if (result == null) {
-                first_test.add(new Message(false, "ERROR (1a): the transaction shall return 3 elements"));
-            } else {
-                first_test.add(new Message(true, "GOOD (1a): the transaction returned some result"));
-                if (result.boughtItems.size() == 3) {
-                    first_test.add(new Message(true, "GOOD (2a): the transaction returned 3 results"));
-                } else {
-                    first_test.add(new Message(false, "ERROR (2a): the transaction returned "+result.boughtItems.size()+" results; 3 were expected"));
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return first_test;
-    };
-
-    public static Function<Boolean,List<Message>> test_09 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("user1");
-        ofUserNames.add("user2");
-        Map<String, Pair<Double, Integer>> m = new HashMap<>();
-        m.put("product", new Pair<>(1.0, 3));
-
-        // 1) The supplier shall be triggered only if I'm sure that the products are bought after the purchase
-        {
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-            SupplierLifecycle sp = new SupplierLifecycle(s);
-            sp.startThread();
-            ClientLifecycle client = new ClientLifecycle("user1", s, 4, 0.0, 100.0, 0);
-            try {
-                var result = client.startJoinAndGetResult(false);
-                s.stopSupplier();
-                if (sp.hasAProductBeenProduced()) {
-                    first_test.add(new Message(false, "ERROR (1a): you shall never produce a product if you are not sure on the availability (the user put it in the basket, but then nothing was purchased and all the items were re-shelved)"));
-                } else {
-                    first_test.add(new Message(true, "GOOD (1a): the supplier will never start running if no product was bought!"));
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // 2) The supplier shall be triggered only if I'm sure that the products are bought after the purchase
-        {
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-            SupplierLifecycle sp = new SupplierLifecycle(s);
-            sp.startThread();
-            ClientLifecycle client = new ClientLifecycle("user1", s, 4, 0.0, 100.0, 0);
-            try {
-                var result = client.startJoinAndGetResult(true);
-                s.stopSupplier();
-                if (!sp.hasAProductBeenProduced()) {
-                    first_test.add(new Message(false, "ERROR (1b): you shall produce a product if you are sure in its unavailability"));
-                } else {
-                    first_test.add(new Message(true, "GOOD (1b): the supplier  needs to be triggered and to produce products!"));
-                }
-                ClientLifecycle client2 = new ClientLifecycle("user2", s, 1, 0.0, 100.0, 0);
-                result = client2.startJoinAndGetResult(true);
-                if (result.boughtItems.size() != 1) {
-                    first_test.add(new Message(false, "ERROR (2b): you should have bought an item after refurbishment!"));
-                } else {
-                    first_test.add(new Message(true, "GOOD (2b): you correctly bought the item that was dispached by the supplier!"));
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-
-        return first_test;
-    };
-
-    public static Function<Boolean,List<Message>> test_10 = (Boolean isGlobalLock) -> {
-        List<Message> first_test = new ArrayList<>();
-        List<String> ofUserNames = new ArrayList<>();
-        ofUserNames.add("user1");
-        ofUserNames.add("user2");
-        Map<String, Pair<Double, Integer>> m = new HashMap<>();
-        m.put("product", new Pair<>(1.0, 3));
-
-        // It shall be never possible that two threads can withdraw the same object simultaneously
-        boolean error1 = false, error2 = false, error3 = false;
-        String u1 = "user1", u2 = "user2";
-        int n = 10000;
-
-        test10_variant(isGlobalLock, first_test, ofUserNames, m, error1, error2, error3, u1, u2, n);
-        test10_variant(isGlobalLock, first_test, ofUserNames, m, error1, error2, error3, u1, u1, n);
-        return first_test;
-    };
-
-    private static void test10_variant(Boolean isGlobalLock, List<Message> first_test, List<String> ofUserNames, Map<String, Pair<Double, Integer>> m, boolean error1, boolean error2, boolean error3, String u1, String u2, int n) {
-        for (int i = 0; i< n; i++) {
-            MyUUID.reset();
-            SolutionServer s = new SolutionServer(ofUserNames, m, isGlobalLock);
-            ClientLifecycle client1 = new ClientLifecycle(u1, s, 2, 0.0, 100.0, 0);
-            ClientLifecycle client2 = new ClientLifecycle(u2, s, 2, 0.0, 100.0, 0);
-            Thread cl1 = client1.thread(true);
-            Thread cl2 = client2.thread(true);
-            cl1.start(); cl2.start();
-            try {
-                cl1.join();
-                cl2.join();
-                var res1 = client1.getBasketResult();
-                var res2 = client2.getBasketResult();
-                if (res1.boughtItems.size()+res2.boughtItems.size() != 3) {
-                    error1 = true;
-                }
-                HashSet<Item> ls = new HashSet<>(3);
-                {
-                    res1.boughtItems.forEach(ls::add);
-                    res2.boughtItems.forEach(ls::add);
-                    if (ls.size() != 3) {
-                        error2 = true;
-                    }
-                    ls.clear();
-                    res1.boughtItems.forEach(ls::add);
-                    ls.retainAll(res2.boughtItems);
-                    if (ls.size() != 0) {
-                        error2 = true;
-                    }
-                }
-                if (!res1.unavailableItems.isEmpty())
-                    error3 = true;
-                else if (!res2.unavailableItems.isEmpty())
-                    error3 = true;
-                if (error1 && error2 && error3) break;
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if (!error1) {
-            first_test.add(new Message(true, "GOOD (1): the threads bought the maxmimum number of available items!"));
-        } else {
-            first_test.add(new Message(false, "ERROR (1): there was a sum of totally bought items that is not 3!"));
-        }
-        if (!error2) {
-            first_test.add(new Message(true, "GOOD (2): the threads bought 3 distinct items!"));
-        } else {
-            first_test.add(new Message(false, "ERROR (2): the threads did not bought 3 distinct items!"));
-        }
-        if (!error3) {
-            first_test.add(new Message(true, "GOOD (3): no item was bought by another thread stealing an item, that then was not bought!"));
-        } else {
-            first_test.add(new Message(false, "ERROR (3): another thread stole an item from another thread, that was not able to buy an item!"));
-        }
-    }
 
     public static boolean isGlobal = true;
     public static double total_score = 0.0;
@@ -891,7 +641,7 @@ public class Testing {
 
     public static void main(String args[]) {
         List<Test> scoring = new ArrayList<>();
-        String StudentId = new SolutionServer(null, null, false).studentId();
+        String StudentId = new RainforestShop(null, null, false).studentId();
         System.out.println("StudentId: " + StudentId);
         if (args.length > 0) {
             isGlobal = args[0].equals("global");

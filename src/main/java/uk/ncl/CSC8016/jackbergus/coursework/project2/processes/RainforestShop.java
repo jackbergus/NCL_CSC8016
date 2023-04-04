@@ -11,16 +11,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class SolutionServer {
+public class RainforestShop {
+
+    /// For correctly implementing the server, pelase consider that
 
     private final boolean isGlobalLock;
     private boolean supplierStopped;
     private Set<String> allowed_clients;
-
     public HashMap<UUID, String> UUID_to_user;
     private volatile HashMap<String, SolutionProduct> available_withdrawn_products;
     private HashMap<String, Double> productWithCost = new HashMap<>();
-
     private volatile Queue<String> currentEmptyItem;
 
 
@@ -28,12 +28,23 @@ public class SolutionServer {
         return isGlobalLock;
     }
 
+    /**
+     * Please replace this string with your student ID, so to ease the marking process
+     * @return  Your student id!
+     */
     public String studentId() {
         return "012345678";
     }
 
 
-    public SolutionServer(Collection<String> client_ids,
+    /**
+     *
+     * @param client_ids                Collection of registered client names that can set up the communication
+     * @param available_products        Map associating each product name to its cost and the initial number of available items on the shop
+     * @param isGlobalLock              Might be used (but not strictly required) To remark whether your solution uses a
+     *                                  pessimistic transaction (isGlobalLock=true) or an optimistic opne (isGlobalLock=false)
+     */
+    public RainforestShop(Collection<String> client_ids,
                           Map<String, Pair<Double, Integer>> available_products,
                           boolean isGlobalLock) {
         supplierStopped = true;
@@ -44,6 +55,7 @@ public class SolutionServer {
         this.available_withdrawn_products = new HashMap<>();
         UUID_to_user = new HashMap<>();
         if (available_products != null) for (var x : available_products.entrySet()) {
+            if (x.getKey().equals("@stop!")) continue;
             productWithCost.put(x.getKey(), x.getValue().key);
             var p = new SolutionProduct();
             for (int i = 0; i<x.getValue().value; i++) {
@@ -76,7 +88,8 @@ public class SolutionServer {
 
     /**
      * This method should be accessible only to the transaction and not to the public!
-     * Logs out the client iff. there was an
+     * Logs out the client iff. there was a transaction that was started with a given UUID and that was associated to
+     * a given user
      *
      * @param transaction
      * @return false if the transaction is null or whether that was not created by the system
@@ -87,12 +100,24 @@ public class SolutionServer {
         return result;
     }
 
+    /**
+     * Lists all of the items that were not basketed and that are still on the shelf
+     * @param transaction
+     * @return
+     */
     List<String> getAvailableItems(Transaction transaction) {
         List<String> ls = Collections.emptyList();
         // TODO: Implement the remaining part!
         return ls;
     }
 
+    /**
+     * If a product can be basketed from the shelf, then a specific instance of the product on the shelf is returned
+     *
+     * @param transaction   User reference
+     * @param name          Product name picked from the shelf
+     * @return  Whether the item to be basketed is available or not
+     */
     Optional<Item> basketProductByName(Transaction transaction, String name) {
         AtomicReference<Optional<Item>> result = new AtomicReference<>(Optional.empty());
         if (transaction.getSelf() == null || (transaction.getUuid() == null)) return result.get();
@@ -100,6 +125,13 @@ public class SolutionServer {
         return result.get();
     }
 
+    /**
+     * If the current transaction has withdrawn one of the objects from the shelf and put it inside its basket,
+     * then the transaction shall be also able to replace the object back where it was (on its shelf)
+     * @param transaction   Transaction that basketed the object
+     * @param object        Object to be reshelved
+     * @return  Returns true if the object existed before and if that was basketed by the current thread, returns false otherwise
+     */
     boolean shelfProduct(Transaction transaction, Item object) {
         boolean result = false;
         if (transaction.getSelf() == null || (transaction.getUuid() == null)) return false;
@@ -107,17 +139,31 @@ public class SolutionServer {
         return result;
     }
 
+    /**
+     * Stops the food supplier by sending a specific message. Please observe that no product shall be named @stop!
+     */
     public void stopSupplier() {
         // TODO: Provide a correct concurrent implementation!
         currentEmptyItem.add("@stop!");
     }
 
+    /**
+     * The supplier acknowledges that it was stopped, and updates its internal state. The monitor also receives confirmation
+     * @param stopped   Boolean variable from the supplier
+     */
     public void supplierStopped(AtomicBoolean stopped) {
         // TODO: Provide a correct concurrent implementation!
         supplierStopped = true;
         stopped.set(true);
     }
 
+    /**
+     * The supplier invokes this method when it needs to know that a new product shall be made ready available.
+     *
+     * This method should be blocking (if currentEmptyItem is empty, then this should wait until currentEmptyItem
+     * contains at least one element and, in that occasion, then returns the first element being available)
+     * @return
+     */
     public String getNextMissingItem() {
         // TODO: Provide a correct concurrent implementation!
         supplierStopped = false;
@@ -126,6 +172,11 @@ public class SolutionServer {
     }
 
 
+    /**
+     * This method is invoked by the Supplier to refurbrish the shop of n products of a given time (current item)
+     * @param n                 Number of elements to be placed
+     * @param currentItem       Type of elements to be placed
+     */
     public void refurbishWithItems(int n, String currentItem) {
         // Note: this part of the implementation is completely correct!
         Double cost = productWithCost.get(currentItem);
@@ -135,6 +186,12 @@ public class SolutionServer {
         }
     }
 
+    /**
+     * This operation purchases all the elements available on the basket
+     * @param transaction               Transaction containing the current withdrawn elements from the shelf (and therefore basketed)
+     * @param total_available_money     How much money can the client spend at maximum
+     * @return
+     */
     public BasketResult basketCheckout(Transaction transaction, double total_available_money) {
         // Note: this part of the implementation is completely correct!
         BasketResult result = null;

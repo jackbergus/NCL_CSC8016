@@ -6,13 +6,13 @@ import uk.ncl.CSC8016.jackbergus.coursework.project2.utils.Item;
 import java.util.*;
 
 public class Transaction {
-    private SolutionServer s;
+    private RainforestShop s;
     private String username;
     private UUID uuid;
 
     private LinkedList<Item> basket;
 
-    Transaction(SolutionServer s, String username, UUID uuid) {
+    Transaction(RainforestShop s, String username, UUID uuid) {
         this.s = s;
         this.username = username;
         this.uuid = uuid;
@@ -27,7 +27,7 @@ public class Transaction {
         return uuid;
     }
 
-    SolutionServer getSelf() {
+    RainforestShop getSelf() {
         return s;
     }
 
