@@ -3,14 +3,13 @@ package uk.ncl.CSC8016.jackbergus.coursework.project2.processes;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.utils.Item;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-public class SolutionProduct {
+public class ProductMonitor {
     Queue<Item> available;
     Queue<Item> withdrawn;
 
-    public SolutionProduct() {
+    public ProductMonitor() {
         available = new LinkedList<>();
         withdrawn = new LinkedList<>();
     }

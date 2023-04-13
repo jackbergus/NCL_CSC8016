@@ -19,7 +19,7 @@ public class RainforestShop {
     private boolean supplierStopped;
     private Set<String> allowed_clients;
     public HashMap<UUID, String> UUID_to_user;
-    private volatile HashMap<String, SolutionProduct> available_withdrawn_products;
+    private volatile HashMap<String, ProductMonitor> available_withdrawn_products;
     private HashMap<String, Double> productWithCost = new HashMap<>();
     private volatile Queue<String> currentEmptyItem;
 
@@ -57,7 +57,7 @@ public class RainforestShop {
         if (available_products != null) for (var x : available_products.entrySet()) {
             if (x.getKey().equals("@stop!")) continue;
             productWithCost.put(x.getKey(), x.getValue().key);
-            var p = new SolutionProduct();
+            var p = new ProductMonitor();
             for (int i = 0; i<x.getValue().value; i++) {
                 p.addAvailableProduct(new Item(x.getKey(), x.getValue().key, MyUUID.next()));
             }

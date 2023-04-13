@@ -2,7 +2,7 @@ package uk.ncl.CSC8016.jackbergus.slides.introduction;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Strict2PLExample {
+public class Strict2PLSimplified {
 
     final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
     volatile long A, B;
@@ -20,7 +20,7 @@ public class Strict2PLExample {
     }
 
     public static void main(String[] args) {
-        Strict2PLExample ex = new Strict2PLExample();
+        Strict2PLSimplified ex = new Strict2PLSimplified();
         for (int i = 0; i<1000; i++) {
             Thread t1 = ex.genThread(), t2 = ex.genThread();
             t1.start(); t2.start();

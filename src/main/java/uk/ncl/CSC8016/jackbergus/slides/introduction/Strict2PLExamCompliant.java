@@ -1,4 +1,4 @@
-package uk.ncl.CSC8016.jackbergus.slides.live;
+package uk.ncl.CSC8016.jackbergus.slides.introduction;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

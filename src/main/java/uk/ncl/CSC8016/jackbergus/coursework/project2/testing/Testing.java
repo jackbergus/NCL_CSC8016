@@ -1,16 +1,12 @@
 package uk.ncl.CSC8016.jackbergus.coursework.project2.testing;
 
-import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.ClientLifecycle;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.RainforestShop;
-import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.SupplierLifecycle;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.processes.Transaction;
 import uk.ncl.CSC8016.jackbergus.coursework.project2.utils.Item;
-import uk.ncl.CSC8016.jackbergus.coursework.project2.utils.MyUUID;
 import uk.ncl.CSC8016.jackbergus.slides.semaphores.scheduler.Pair;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,6 @@
 package uk.ncl.CSC8016.jackbergus.slides.introduction;
 
-public class Slide8 {
+public class ThreadHelloWorld {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Running the main thread from the process!");
