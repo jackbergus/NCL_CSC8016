@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Slide17 {
         public static void main(String[] args) throws Exception {
             boolean lastExample = false;
-            boolean doWait = true;
+            boolean doWait = false;
             for (int i = 0; i<1000; i++ ) {
                 // Execrise:
                 // 1) What happens if I replace this with a read lock from the same ReadWriteLock?
@@ -14,32 +14,26 @@ public class Slide17 {
                 System.out.println("Run #"+i);
                 var t1 = new Thread(() -> {
                     if (lastExample) rl.lock();
-                    System.out.println("A");
-                    if (doWait) try {
-                        Thread.sleep(100);
+                    try {
+                        System.out.println("A");
+                        if (doWait) Thread.sleep(100);
+                        System.out.println("B");
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
-                    }
-                    System.out.println("B");
-                if (lastExample) try{
-                    rl.unlock();
                     } finally {
-                }
+                        if (lastExample) rl.unlock();
+                    }
                 });
                 var t2 = new Thread(() -> {
                     if (lastExample) rl.lock();
-                    System.out.println(1);
-                    if (doWait) try {
-                        Thread.sleep(100);
+                    try {
+                        System.out.println("1");
+                        if (doWait) Thread.sleep(100);
+                        System.out.println("2");
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
-                    }
-                    System.out.println(2);
-
-                    if (lastExample) try{
-                        rl.unlock();
                     } finally {
-
+                        if (lastExample) rl.unlock();
                     }
                 });
                 t1.start(); t2.start();

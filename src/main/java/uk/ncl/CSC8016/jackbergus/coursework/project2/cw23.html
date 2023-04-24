@@ -1,0 +1,135 @@
+<h1 class="unnumbered" id="use-case-scenario">Use Case Scenario</h1>
+<p>We want to implement a virtual shopping system, whether the threads are either clients using the web app, or clients buying products on the physical shop using the mobile app. The lifecycle of any client interaction is summerised by <code>ClientLifecycle</code>: Each client interacts with the shop through the <code>RainforestShop</code> via the <code>login</code> method, through which each client can add items to its basket and perform re-shelving operations (moving the items back to the physical/virtual shelf from the basket). Each client can get a list of available items at the time of the query, basket a given product by name, (re)shelf the product (thus removing it from the basket), checkout and proceed with the payment (thus either buying all the items on the basket or none of those entirely), and logging out of the system while losing the information of all the items being previously put in the basket from the real/virtual shelf (thus entailing implicit re-shelving).</p>
+<p><span>Each time an allowed user logs in, a non-empty transaction will be created with an unique transaction ID. The unavailability of the product shall be confirmed not while basketing the items, rather than after purchasing those. At this stage, the shop supplier (<code>SupplierLifecycle</code>) might be notified that some products are missing (<code>getNextMissingItem</code>) and refurbish the show with a non-zero amount of products of the same type (<code>refurbishWithItems</code>). For simplicity sake, the <code>refurbishWithItems</code> method will be in charge of creating the number of desired product and to place them on the shelf. </span></p>
+<p>As in any industrial setting where teams split up the duties, you are assigned an API that you need to implement. Such an API is provided both on Canvas and at <a href="https://github.com/jackbergus/NCL_CSC8016/tree/main/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/project2">https://github.com/jackbergus/NCL_CSC8016/tree/main/src/main/java/uk/ncl/CSC8016/jackbergus/coursework/project2</a>. This will then require to finalise the implementation of <code>RainforestShop</code> and the integration of concurrency mechanisms in <code>ProductMonitor</code>; the <code>Transaction</code> class shall not be changed! The <code>Testing</code> solves a twofold task: showing how Clients, Suppliers, and the Shop system are communicating, as well as providing some preliminary guidelines on how the coursework is going to be assessed. The student is free to choose whichever is the best way to pass the tests (not fully disclosed to the students) in the <code>Testing</code> class. E.g., the RainforestShop could be either modelled as a finer-grained monitor, but inside this monitor at least one thread per logged user should be running; also, such a RainforestShop could be also implemented as a consumer threads handling all of the clients’ messages.</p>
+<h1 class="unnumbered" id="assumptions">Assumptions</h1>
+<h1 class="unnumbered" id="submission-requirements">Submission Requirements</h1>
+<ol>
+<li><p><code>RainforestShop</code> and <code>ProductMonitor</code> should be finalised, as the current implementation does not pass the provided tests!</p></li>
+<li><p>Submit the code as a zipped <em>Maven</em> project. with <strong>no</strong> <em>jar</em> and <em>classes</em>. The source code will be recompiled from scratch, and no jar/class is going to be run.</p></li>
+<li><p>If you want to use an external Java library, please consider the following:</p>
+<ul>
+<li><p>The Java library should be explicitly described as a <code>&lt;dependency&gt;</code> in the <code>pom.xml</code> file, and should only access the libraries from the default <em>Maven Central Repository</em>.</p></li>
+<li><p>A library might provide single concurrency mechanisms primitives, but not ready-made solutions already composing those: semaphores, monitors, locks, just logs, thread barriers, thread pools, passing le baton mechanisms are allowed. Code reuse from the exercises and examples seen in class is permitted.</p></li>
+<li><p>Systems completely solving the coursework for you are <strong>strictly prohibited</strong>: e.g., any kind of (data) management system having concurrency control (ensuring safe concurrent thread access to any data representation) and supporting concurrent transactions (implementing any kind of transaction protocol, either pessimistic or optimistic) <strong>must be avoided</strong>, as they both implement commit/aborts and thread-safe operations on data.</p></li>
+<li><p>None of the (direct or indirect) dependencies of the coursework should rely on external servers or processes to run or to be installed.</p></li>
+<li><p>The solution should <strong>not</strong> include external jar files.</p></li>
+<li><p>If unsure whether the solution might be exploited, please ask before submitting.</p></li>
+</ul></li>
+<li><p>Attached to the source code, please provide a short report motivating the compliance of the source code to each point and sub-point of the marking scheme. Providing such report in form of comments in the implementation is also fine. New classes might be created for supporting the implementation, but existing classes should be neither renamed or moved to a different package.</p></li>
+</ol>
+<h1 class="unnumbered" id="marking-scheme">Marking Scheme</h1>
+<p>The marking scheme is capped at <strong>100%</strong>.</p>
+<ul>
+<li><p>Single-Thread Correctness <strong>[+52%]</strong></p>
+<dl>
+<dt>+4%:</dt>
+<dd><p>I cannot open a transaction if the user does not appear in the users’ collection.</p>
+<ul>
+<li><p>(You) cannot login (and therefore, start a transaction) if a user is not listed (no user appearing in the initial RainforestShop collection).</p></li>
+<li><p>Cannot login (and therefore, start a transaction) if a user is not listed (User not appearing in the RainforestShop collection).</p></li>
+</ul>
+</dd>
+<dt>+3%:</dt>
+<dd><p>I can always open a transaction if the user, on the other hand, appears on the users’ collection.</p>
+</dd>
+<dt>+7%:</dt>
+<dd><p>I cannot log-out multiple times using the same transaction, but it should be possible to re-log in, and the novel transaction shall have a different id.</p>
+<ul>
+<li><p>Can immediately log-out after logging in on the same transaction.</p></li>
+<li><p>Logging out multiple times on the same transaction is not permitted (returns false).</p></li>
+<li><p>The same user can open multiple transactions (not necessarily being contemporarily open).</p></li>
+<li><p>Each transaction opened by the user should come with a distinct transaction id.</p></li>
+</ul>
+</dd>
+<dt>+7%:</dt>
+<dd><p>I must neither basket nor purchase unavailable products.</p>
+<ul>
+<li><p>Cannot basket items when the map is empty.</p></li>
+<li><p>Cannot basket items not listed in the map.</p></li>
+<li><p>Cannot basket more items than specified in the map.</p></li>
+<li><p>Can basket available products.</p></li>
+<li><p>Can shelf previously-basketed products.</p></li>
+<li><p>Can re-basket a product that was previously shelved.</p></li>
+<li><p>After the last point, I cannot re-basket the same item another time.</p></li>
+</ul>
+</dd>
+<dt>+3%:</dt>
+<dd><p>Logging out automatically re-shelves all the remaining product non-purchased in the basket, and therefore it shall be possible to re-basket the products.</p>
+</dd>
+<dt>+3%: </dt>
+<dd><p>Logging out should also automatically disable all the remaining operations available through the transaction (mainly <code>basketProduct</code>, <code>shelfProduct</code>, and <code>basketCheckout</code>).</p>
+</dd>
+<dt>+20%: </dt>
+<dd><p>Correctly purchasing the available items (single-threaded).</p>
+<ul>
+<li><p>It should be possible to basket checkout when the basket is empty, with any given amount of money</p></li>
+<li><p>After successfully purchasing one item, the checkout returns the correct information.</p></li>
+<li><p>After successfully purchasing two items, the checkout returns the correct information.</p></li>
+<li><p>When attempting to purchase three items where only two are available, the checkout correctly purchases two items.</p></li>
+</ul>
+</dd>
+<dt>+5%:</dt>
+<dd><p>Correctly shelving the products.</p>
+<ul>
+<li><p>Cannot shelf a product that did not originally exist.</p></li>
+<li><p>Cannot shelf a product that was not basketed (empty basket).</p></li>
+<li><p>Cannot shelf a product that was not basketed (non-empty basket).</p></li>
+<li><p>Can shelf a product that was originally basketed.</p></li>
+</ul>
+</dd>
+</dl></li>
+<li><p>Multi-Threaded Correctness <strong>[+38%]</strong></p>
+<dl>
+<dt>+6%:</dt>
+<dd><p>The same user can log-in multiple times.</p>
+<ul>
+<li><p>The same user can open multiple transactions (contemporarily open).</p></li>
+</ul>
+</dd>
+<dt>+6%: </dt>
+<dd><p>Two threads shall never be able (in any possible run) to contemporary access to the same object on the shelf.</p>
+</dd>
+<dt>+5%: </dt>
+<dd><p>A client running without a supplier shall always dispose the available resources.</p>
+<ul>
+<li><p>In particular, a <code>ClientLifecycle</code> should be able to buy all the available elements if given an adequate amount of money.</p></li>
+</ul>
+</dd>
+<dt>+6%: </dt>
+<dd><p>Correct Client/Shop/Supplier interaction. This might be tested with at least one <code>ClientLifecycle</code> and one <code>SupplierLifecycle</code> running.</p>
+<ul>
+<li><p>The supplier shall not be triggered if the products are basketed but not bought (as they can be later on re-shelved).</p></li>
+<li><p>The supplier shall be triggered when a shelf for a given product is emptied.</p></li>
+<li><p>After refurbishment, a client shall be able to buy at least one more product.</p></li>
+</ul>
+</dd>
+<dt>+12%: </dt>
+<dd><p>Correct Client/Client interaction (two distinct users and two transactions from the same user).</p>
+<ul>
+<li><p>The clients bought the maximum number of available items.</p></li>
+<li><p>The clients bought 3 distinct items.</p></li>
+<li><p>The clients cannot contemporarily buy the same item.</p></li>
+</ul>
+</dd>
+<dt>+3%: </dt>
+<dd><p>Correct Supplier Stopping.</p>
+<ul>
+<li><p>The supplier is stopped by receiving a <code>@stop!</code> message only when the <code>stopSupplier</code> method is invoked.</p></li>
+<li><p>Currency is handled correctly.</p></li>
+</ul>
+</dd>
+</dl></li>
+<li><p>Advanced Features</p>
+<ul>
+<li><p><strong>[+5%]</strong> The RainforestShop is emulated realistically as a separate thread.</p></li>
+<li><p><strong>[+1%]</strong> The code exploits Java’s concurrent collections.</p></li>
+<li><p><strong>[+1%]</strong> The program allows to visually determine the correctness of the operations performed by the threads (e.g., terminal prints or graphical user interfaces).</p></li>
+<li><p><strong>[+1%]</strong> The student correctly uses ReentrantLocks and Conditions.</p></li>
+<li><p><strong>[+2%]</strong> The student correctly exploits semaphores.</p></li>
+<li><p><strong>[+2%]</strong> The student exploited the optimistic transaction principle, where multiple users can log-in (not only the same user multiple times!).</p></li>
+<li><p><strong>[+2%]</strong> Usage of monitors or multithreaded producers and consumers on the interaction with the supplier (semaphores might be also exploited).</p></li>
+<li><p><strong>[+3%]</strong> Thread pools are used to handle multiple requests from multiple users.</p></li>
+<li><p><strong>[+3%]</strong> Any Java library imported via <code>pom.xml</code> ‘not violating the 3<sup>rd</sup> Submission Requirement.</p></li>
+</ul></li>
+</ul>
