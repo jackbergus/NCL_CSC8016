@@ -7,7 +7,7 @@ public class InterruptingThreads {
         var t = new Thread(() -> {
            for (int i = 0; i<5; i++) {
                try {
-                   Thread.sleep(2000);
+                   Thread.sleep(200);
                } catch (InterruptedException e) {
                    System.out.println(Thread.currentThread().getName() + " was interrupted out of seep for the " + i +"-th time");
                }
