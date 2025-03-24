@@ -10,16 +10,17 @@ import java.util.function.Supplier;
 
 public class ReadWriteMonitorMultiRead<T> { // This implements a waiting system for a specific value to be produced
 
-    private int nr, nw, ww, nrwo; // TODO: remove nrwo
+    private int nr, nw, ww;
     ReentrantLock monitor;
     Condition okToRead, okToWrite;
-    T object; // TODO: KEEP
+    T object;
 
     public ReadWriteMonitorMultiRead() {
         monitor = new ReentrantLock(true);
         okToRead = monitor.newCondition();
         okToWrite = monitor.newCondition();
-        nr = nw = ww = nrwo = 0; // TODO: remove nrwo
+
+        nr = nw = ww = 0; // TODO: remove nrwo
         object = null; // TODO: KEEP
     }
 
@@ -38,48 +39,6 @@ public class ReadWriteMonitorMultiRead<T> { // This implements a waiting system 
      */
     public T get(Supplier<T> hasToReadEvent, T previousObject) {
         T result = null;
-        // TODO: REMOVE AFTER THIS
-        boolean wasInterrupted = false;
-        monitor.lock();
-        boolean isObjectEmpty = (hasToReadEvent == null) && (object == null || ((previousObject != null) && (Objects.equals(previousObject, object))));
-        if ((nw > 0 ) || (ww > 0) || (isObjectEmpty)) {
-            if (isObjectEmpty) nrwo++;
-            while ((nw > 0 ) || (ww > 0) || (isObjectEmpty)) {
-                try {
-                    okToRead.await();
-                    isObjectEmpty = (hasToReadEvent == null) && (object == null || ((previousObject != null) && (Objects.equals(previousObject, object))));
-                } catch (Exception e) {
-//                    System.out.println(Thread.currentThread().getName()+": Was interrupted!");
-                    wasInterrupted = true;
-                    break;
-                }
-            }
-            if (isObjectEmpty) nrwo--;
-        }
-        nr++;
-        isObjectEmpty = (hasToReadEvent == null) && (object == null || ((previousObject != null) && (Objects.equals(previousObject, object))));
-        if (!wasInterrupted) {
-            if (!((nw > 0 ) || (ww > 0) || (isObjectEmpty))) {
-//                System.out.println(Thread.currentThread().getName()+": OKTOREAD(2)");
-                okToRead.signal();
-            }
-        }
-        monitor.unlock();
-        if (!wasInterrupted) {
-            if ((hasToReadEvent == null) && object == null)
-                throw new RuntimeException("ERROR: as you registered for an event, you have to wait for the read!");
-            if ((hasToReadEvent == null)) {
-                result = object;
-            } else {
-                result = hasToReadEvent.get();
-            }
-        }
-        monitor.lock();
-        nr--;
-        if (nr == 0)
-            okToWrite.signal();
-        monitor.unlock();
-        // TODO: REMOVE BEFORE THIS
         return result;
     }
 
@@ -94,57 +53,6 @@ public class ReadWriteMonitorMultiRead<T> { // This implements a waiting system 
     public boolean set(Supplier<T> objectProducer) {
         boolean condition= false;
         T obj = null;
-        // TODO: REMOVE AFTER THIS
-        if (objectProducer == null)
-            return false;
-        boolean wasObjectEmpty = true;
-        monitor.lock();
-        boolean wasInterrupted = false;
-        if (objectProducer == null)
-            return false;
-        if ((nw > 0) || (nr > 0)) {
-            ww++;
-            while ((nw > 0) || (nr > 0)) {
-                try {
-                    okToWrite.await();
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Interrupted!");
-                    wasInterrupted = true;
-                    break;
-                }
-            }
-            ww--;
-        }
-        nw++;
-        monitor.unlock();
-        if (!wasInterrupted) {
-            // Removing the possibility to reading stale events!
-            wasObjectEmpty = this.object == null;
-            // Adding as many new events as the currently-available readers
-            obj = objectProducer.get();
-            if (obj != null) {
-//                if (!wasObjectEmpty) {
-//                    this.object = object;
-//                }
-//            for (int i = 0; i<Math.max(1, nrwo); i++) {
-                this.object = (obj);
-//            }
-            }
-        }
-        monitor.lock();
-        nw--;
-        if (nr == 0) okToWrite.signal();
-        if (!wasInterrupted) {
-            if (obj != null) {
-                for (int i = 0; i<Math.max(1, nrwo); i++) {
-//                    System.out.println(Thread.currentThread().getName()+": OKTOREAD(1)");
-                    okToRead.signal();
-                }
-            }
-        }
-        condition = (!wasInterrupted) && ((objectProducer==null) || (obj != null));
-        monitor.unlock();
-        // TODO: REMOVE BEFORE THIS
         return condition;
     }
 

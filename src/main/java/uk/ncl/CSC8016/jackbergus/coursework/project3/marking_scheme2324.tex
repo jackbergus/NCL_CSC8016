@@ -66,6 +66,7 @@ Still, this should require not changing the strict assumption over the API being
 		%you must correcly handle client log outs (withdrawn items from the shelves after log-out should be automatically re-shelved with a cookie-free assumption, where the basket is not ``rembered'' after re-logging in)!
 		\item We assume that no user registration, logging, or ban, is given. Additional features going beyond the specifications within the marking scheme will not be evaluated. 
 		\item The server should allow the creation of multiple topics with the same name and different and incremental ID \textbf{as far as different timestamps are given to distinguish them}. In order to maximise seriality and concurrency requirements, the students might investigate \textit{optimistic protocols}, thus allowing the concurrent posting across different topic, as this will give the chance to gain extra points.
+<<<<<<< HEAD
 		\item A solution might be deemed incorrect for the following reasons:
 		\begin{enumerate}
 		\item Products that were originally basketed cannot be bought any more (e.g., both users attempted to basket a product but only one of them was able to buy it).
@@ -73,6 +74,15 @@ Still, this should require not changing the strict assumption over the API being
 
 		\item Somehow, the computations are ``logically'' correct with single-threaded scenarios, that is \textsf{basket}, \textsf{reshelf}, \textsf{checkout}, and \textsf{logout} implement the expected semantics. Still, this is not sufficient for passing the coursework with full marks. 
 		\end{enumerate}
+=======
+%		\item A solution might be deemed incorrect for the following reasons:
+%		\begin{enumerate}
+%		\item Products that were originally basketed cannot be bought any more (e.g., both users attempted to basket a product but only one of them was able to buy it).
+%	\item The same product name with the same product id cannot be bought multiple times.
+%
+%		\item Somehow, the computations are ``logically'' correct with single-threaded scenarios, that is \textsf{basket}, \textsf{reshelf}, \textsf{checkout}, and \textsf{logout} implement the expected semantics. Still, this is not sufficient for passing the coursework with full marks. 
+%		\end{enumerate}
+>>>>>>> ceb25df832c693cde5eb07947b25ad6687ef1066
 	\end{itemize}
 	
 	\section*{Submission Requirements}
@@ -81,7 +91,11 @@ Still, this should require not changing the strict assumption over the API being
 		\item \texttt{Blog} and \texttt{ReadWriteMonitorMultiRead} should be finalised, as the current implementation does not pass the provided tests! The latter class should be used within the former as a main reentrant locking mechamism for the \texttt{Blog} monitor (or thread-pool server). 
 
 The \texttt{TopicUpdates} class 
+<<<<<<< HEAD
 		\item Submit the code as a zipped \textit{Maven} project via \texttt{File > Export > Project to Zip file\dots} with \textbf{no} \textit{jar} and \textit{classes}. The source code will be recompiled from scratch, and no pre-compiled jar/class is going to be run.
+=======
+		\item The student shall submit the code as a zipped \textit{Maven} project via \texttt{File > Export > Project to Zip file\dots} with \textbf{no} \textit{jar} and \textit{classes}. The source code will be recompiled from scratch, and no pre-compiled jar/class is going to be run.
+>>>>>>> ceb25df832c693cde5eb07947b25ad6687ef1066
 		 
 		\item If you want to use an external Java library, please consider the following:
 		\begin{itemize}
