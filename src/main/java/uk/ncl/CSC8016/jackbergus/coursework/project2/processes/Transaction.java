@@ -58,7 +58,9 @@ public class Transaction {
 
     public boolean shelfProduct(Item name) {
         if (s == null || (uuid == null)) return false;
-        return s.shelfProduct(this, name);
+        boolean result = s.shelfProduct(this, name);
+        if (result) basket.remove(name);
+        return result;
     }
 
     public BasketResult basketCheckout(double total_available_money) {
